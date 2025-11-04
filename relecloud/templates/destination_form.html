@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+Editar destino
+{% endblock title %}
+
+{% block content %}
+  <h2>Editar {{ destination.name }}</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    <!-- {{ form.as_p }} -->
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a href="{% url 'destinations' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+{% endblock content %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ destination.name }} - Relecloud
+{% endblock title %}
+
+{% block content %}
+  <h2>{{ destination.name }}</h2>
+  <p>{{ destination.description }}</p>
+
+  <a href="{% url 'destinations' %}">← Volver a la lista de destinos</a>
+{% endblock content %}

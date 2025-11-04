@@ -1,19 +1,51 @@
-# Starter pipeline hay que poner python to linux web app on azure
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Python to Linux Web App on Azure
+# Build your Python project and deploy it to an Azure Web App running on Linux.
+# Docs: https://learn.microsoft.com/azure/devops/pipelines/languages/python
 
 trigger:
 - main
 
+variables:
+  # Nombre de tu App Service en Azure
+  azureWebAppName: 'DavidFFDjango'
+  # Versión de Python a usar
+  pythonVersion: '3.10'
+
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+# 1️⃣ Configurar versión de Python
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(pythonVersion)'
+  displayName: 'Set up Python $(pythonVersion)'
 
+# 2️⃣ Instalar dependencias
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install dependencies'
+
+# 3️⃣ (Opcional) Ejecutar tests
+# - script: |
+#     pytest
+#   displayName: 'Run tests'
+
+# 4️⃣ Publicar artefactos (por si hay build)
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+    includeRootFolder: false
+    archiveType: zip
+    archiveFile: '$(Build.ArtifactStagingDirectory)/python-app.zip'
+    replaceExistingArchive: true
+  displayName: 'Archive project files'
+
+# 5️⃣ Desplegar a Azure Web App (Linux)
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'azureISW2_DFARFAN'
+    appName: '$(azureWebAppName)'
+    package: '$(Build.ArtifactStagingDirectory)/python-app.zip'
+  displayName: 'Deploy to Azure Web App (Linux)'

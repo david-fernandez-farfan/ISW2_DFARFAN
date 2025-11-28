@@ -1,4 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.urls import reverse
+
+# ============================================================
+#  DESTINATION
+# ============================================================
 
 class Destination(models.Model):
     name = models.CharField(
@@ -13,9 +20,21 @@ class Destination(models.Model):
         blank=False
     )
 
+    # 🔥 PT4 — media de reviews
+    @property
+    def average_rating(self):
+        reviews = self.review_set.all()
+        if not reviews.exists():
+            return None
+        return round(sum(r.rating for r in reviews) / reviews.count(), 1)
+
     def __str__(self):
         return self.name
 
+
+# ============================================================
+#  CRUISE
+# ============================================================
 
 class Cruise(models.Model):
     name = models.CharField(
@@ -34,9 +53,21 @@ class Cruise(models.Model):
         related_name='cruises'
     )
 
+    # 🔥 PT4 — media de reviews (si aplica también a cruceros)
+    @property
+    def average_rating(self):
+        reviews = self.review_set.all()
+        if not reviews.exists():
+            return None
+        return round(sum(r.rating for r in reviews) / reviews.count(), 1)
+
     def __str__(self):
         return self.name
 
+
+# ============================================================
+#  INFO REQUEST
+# ============================================================
 
 class InfoRequest(models.Model):
     name = models.CharField(
@@ -62,3 +93,67 @@ class InfoRequest(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# ============================================================
+#  REVIEW MANAGER
+# ============================================================
+
+class ReviewManager(models.Manager):
+    def create_review(self, user, destination=None, cruise=None, rating=0, comment=""):
+        # Verifica compra (PT3)
+        if not user.has_purchased(destination, cruise):
+            raise PermissionDenied("User has not purchased this item")
+
+        review = self.model(
+            user=user,
+            destination=destination,
+            cruise=cruise,
+            rating=rating,
+            comment=comment
+        )
+        review.full_clean()  # valida rating y destino/cruise
+        review.save()
+        return review
+
+
+# ============================================================
+#  REVIEW MODEL
+# ============================================================
+
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    destination = models.ForeignKey(
+        "Destination",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
+    )
+    cruise = models.ForeignKey(
+        "Cruise",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
+    )
+    rating = models.IntegerField()
+    comment = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = ReviewManager()
+
+    def clean(self):
+        # Validación de rating
+        if not 1 <= self.rating <= 5:
+            raise ValidationError("Rating must be 1–5")
+
+        # Debe tener destino o crucero
+       #if not (self.destination or self.cruise):
+        #   raise ValidationError("Review must reference a destination or a cruise")
+
+    def __str__(self):
+        name = self.destination.name if self.destination else self.cruise.name
+        return f"{self.user.username} → {name}"
+
+def get_absolute_url(self):
+    return reverse("destination_detail", args=[self.id])

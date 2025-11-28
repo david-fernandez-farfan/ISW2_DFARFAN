@@ -15,4 +15,24 @@ ReleCloud - {{ destination }}
     <a class="list-group-item list-group-item-action" href="{% url 'cruise_detail' cruise.id %}">{{ cruise }}</a>
     {% endfor %}
 </ul>
+
+<h3>Reviews</h3>
+
+<!-- Botón para crear review -->
+<a href="{% url 'add_review_destination' destination_id=destination.id %}"
+   class="btn btn-primary">
+    Añadir review
+</a>
+
+<hr>
+
+<!-- Mostrar reviews -->
+{% for review in destination.review_set.all %}
+    <p><strong>{{ review.user.username }}</strong> — ⭐ {{ review.rating }}</p>
+    <p>{{ review.comment }}</p>
+    <hr>
+{% empty %}
+    <p>No hay reviews todavía.</p>
+{% endfor %}
+
 {% endblock content %}

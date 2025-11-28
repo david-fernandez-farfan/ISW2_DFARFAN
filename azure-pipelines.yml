@@ -1,51 +1,94 @@
-# Python to Linux Web App on Azure
-# Build your Python project and deploy it to an Azure Web App running on Linux.
-# Docs: https://learn.microsoft.com/azure/devops/pipelines/languages/python
-
 trigger:
-- main
-
-variables:
-  # Nombre de tu App Service en Azure
-  azureWebAppName: 'DavidFFDjango'
-  # Versión de Python a usar
-  pythonVersion: '3.10'
+  branches:
+    include:
+      - main
+      - feature/*
 
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-# 1️⃣ Configurar versión de Python
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(pythonVersion)'
-  displayName: 'Set up Python $(pythonVersion)'
+variables:
+  pythonVersion: '3.11'
+  projectRoot: '.'
 
-# 2️⃣ Instalar dependencias
-- script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-  displayName: 'Install dependencies'
+stages:
 
-# 3️⃣ (Opcional) Ejecutar tests
-# - script: |
-#     pytest
-#   displayName: 'Run tests'
+# -----------------------------
+# 1. TEST STAGE
+# -----------------------------
 
-# 4️⃣ Publicar artefactos (por si hay build)
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-    includeRootFolder: false
-    archiveType: zip
-    archiveFile: '$(Build.ArtifactStagingDirectory)/python-app.zip'
-    replaceExistingArchive: true
-  displayName: 'Archive project files'
+- stage: Test
+  displayName: "Run Django Tests"
+  jobs:
+  - job: RunTests
+    displayName: "Install dependencies and execute tests"
+    steps:
 
-# 5️⃣ Desplegar a Azure Web App (Linux)
-- task: AzureWebApp@1
-  inputs:
-    azureSubscription: 'azureISW2_DFARFAN'
-    appName: '$(azureWebAppName)'
-    package: '$(Build.ArtifactStagingDirectory)/python-app.zip'
-  displayName: 'Deploy to Azure Web App (Linux)'
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+
+    - script: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        python manage.py collectstatic --noinput
+        python manage.py test
+      displayName: "Run Django tests"
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/TEST-*.xml'
+        failTaskOnFailedTests: false
+      condition: succeededOrFailed()
+      displayName: "Publish test results"
+
+# -----------------------------
+# 2. BUILD STAGE
+# -----------------------------
+
+- stage: Build
+  displayName: "Build Artifact"
+  dependsOn: Test
+  condition: succeeded()
+  jobs:
+  - job: BuildArtifact
+    displayName: "Archive project"
+    steps:
+
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(projectRoot)'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/relecloud.zip'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)/relecloud.zip'
+        artifactName: 'drop'
+      displayName: "Publish build artifact"
+
+# -----------------------------
+# 3. DEPLOY STAGE
+# -----------------------------
+
+- stage: Deploy
+  displayName: "Deploy to Azure Web App"
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - job: DeployWebApp
+    displayName: "Deploy to Azure App Service"
+    steps:
+
+    # Autenticación con el servicio Azure
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+        appType: 'webAppLinux'
+        appName: '$(AZURE_WEBAPP_NAME)'
+        package: '$(Pipeline.Workspace)/drop/relecloud.zip'
+      displayName: "Deploy to Azure App Service"

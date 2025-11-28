@@ -1,24 +1,19 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Relecloud - Destinations
-{% endblock title %}
+ReleCloud - Destinations
+{% endblock %}
 
 {% block content %}
-  <h1>ReleCloud Destinations</h1>
-
-  {% if destinations %}
-    <ul class="list-group">
-      {% for destination in destinations %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <a class="list-group-item-action" href="{% url 'destination_detail' destination.id %}">
-            {{ destination.name }}
-          </a>
-          <a class="btn btn-sm btn-warning" href="{% url 'destination_update' destination.id %}">Editar</a>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No hay destinos disponibles en este momento.</p>
-  {% endif %}
+<h1>Cruise destinations</h1>
+<p>
+If you can imagine it, we travel to it! Below is our list of confirmed destinations.
+</p>
+<ul class="list-group">
+    {% for destination in destinations %}
+    <a class="list-group-item list-group-item-action" href="{% url 'destination_detail' destination.id %}">
+        {{ destination }}
+    </a>
+    {% endfor %}
+</ul>
 {% endblock content %}

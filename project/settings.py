@@ -26,7 +26,7 @@ SECRET_KEY = '_*&5c@1153xw6=489*2*=&*%=4)8f^m54kb@3ca-cb(wm%b@wm'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "davidffdjang.azurewebsites.net",
+    "davidffdjango.azurewebsites.net",
     "localhost",
     "127.0.0.1"
 ]

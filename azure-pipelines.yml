@@ -87,7 +87,7 @@ stages:
     # Autenticación con el servicio Azure
     - task: AzureWebApp@1
       inputs:
-        azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+        azureSubscription: 'azure-relecloud-connection'
         appType: 'webAppLinux'
         appName: '$(AZURE_WEBAPP_NAME)'
         package: '$(Pipeline.Workspace)/drop/relecloud.zip'

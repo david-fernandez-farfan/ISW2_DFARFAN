@@ -5,7 +5,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.shortcuts import render, get_object_or_404
 from .models import Destination, Cruise, Review
 from .forms import InfoRequestForm
 
@@ -85,8 +85,7 @@ class DestinationDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context["reviews"] = Review.objects.filter(destination=self.object)
         return context
-
-
+    
 # ============================
 # CRUISE DETAIL
 # ============================

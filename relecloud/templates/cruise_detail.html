@@ -6,6 +6,13 @@ ReleCloud - {{ cruise }}
 
 {% block content %}
 <h1>{{ cruise }}</h1>
+
+{% if cruise.average_rating %}
+    <p>Valoración media: ⭐ {{ cruise.average_rating }} / 5</p>
+{% else %}
+    <p>Este crucero aún no tiene valoraciones.</p>
+{% endif %}
+
 <p>
 {{ cruise.description }}
 </p>

@@ -6,8 +6,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404
-from .models import Destination, Cruise, Review
-from .forms import InfoRequestForm
+from .models import Destination, Cruise, Review, InfoRequest, Purchase
+from .forms import InfoRequestForm, ReviewForm 
+from django.contrib import messages
 
 
 # ============================
@@ -68,11 +69,6 @@ def info_request_view(request):
 
     return render(request, "info_request.html", {"form": form})
 
-
-def success_view(request):
-    return render(request, "success.html")
-
-
 # ============================
 # DESTINATION DETAIL
 # ============================
@@ -83,7 +79,14 @@ class DestinationDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["reviews"] = Review.objects.filter(destination=self.object)
+        destination = self.object  # 👈 destino actual (el de /destination/1/)
+        
+        # Lista de reviews para este destino
+        context["reviews"] = Review.objects.filter(destination=destination)
+
+        # Puede valorar o no (PT3)
+        context["can_review"] = user_has_purchased_destination(self.request.user, destination)
+
         return context
     
 # ============================
@@ -112,6 +115,8 @@ class InfoRequestCreate(SuccessMessageMixin, generic.CreateView):
         'Thank you, %(name)s! We will email you when we have more information about %(cruise)s!'
     )
 
+def success_view(request):
+    return render(request, "success.html")
 
 # ============================
 # REVIEW CREATE
@@ -140,4 +145,66 @@ class ReviewCreateView(LoginRequiredMixin, generic.CreateView):
             return reverse_lazy("destination_detail", args=[self.object.destination.id])
         else:
             return reverse_lazy("cruise_detail", args=[self.object.cruise.id])
+        
+        
+    def dispatch(self, request, *args, **kwargs):
+        destination_id = kwargs.get("destination_id")
+        cruise_id = kwargs.get("cruise_id")
 
+        # Caso: review para DESTINATION
+        if destination_id:
+            destination = get_object_or_404(Destination, pk=destination_id)
+            if not user_has_purchased_destination(request.user, destination):
+                messages.error(request, "No puedes valorar este destino porque no has comprado ningún crucero asociado.")
+                return redirect("destination_detail", pk=destination.id)
+
+        # (Si tuvieras lógica similar para cruceros, la pondríamos aquí)
+
+        return super().dispatch(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        # Identificar si el review es para DESTINO o CRUCERO
+        destination_id = self.kwargs.get("destination_id")
+        cruise_id = self.kwargs.get("cruise_id")
+
+        if destination_id:
+            form.instance.destination = get_object_or_404(Destination, pk=destination_id)
+        if cruise_id:
+            form.instance.cruise = get_object_or_404(Cruise, pk=cruise_id)
+
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        # Redirige al detalle correspondiente
+        if self.object.destination:
+            return reverse_lazy("destination_detail", args=[self.object.destination.id])
+        else:
+            return reverse_lazy("cruise_detail", args=[self.object.cruise.id])
+        
+# ============================
+# HELPERS PT3
+# ============================
+
+def user_has_purchased_destination(user, destination: Destination) -> bool:
+
+    if not user.is_authenticated:
+        return False
+
+    # ⚠️ De momento ponemos True para poder probar la PT3.
+    # Cuando tengas el modelo de compra, sustituye esta línea por la consulta real.
+    return True
+
+
+def user_has_purchased_destination(user, destination: Destination) -> bool:
+    """
+    Devuelve True si el usuario ha comprado un crucero
+    que tenga este destino asociado.
+    """
+    if not user.is_authenticated:
+        return False
+
+    return Purchase.objects.filter(
+        user=user,
+        cruise__destinations=destination
+    ).exists()

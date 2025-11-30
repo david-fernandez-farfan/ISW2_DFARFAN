@@ -19,6 +19,15 @@ ReleCloud - {{ destination }}
 
 <p>{{ destination.description }}</p>
 
+{% if destination.average_rating %}
+    <p>
+        Valoración media: ⭐ {{ destination.average_rating }} / 5
+    </p>
+{% else %}
+    <p>
+        Este destino aún no tiene valoraciones.</p>
+{% endif %}
+
 <p>You can explore {{ destination }} on the following cruises:</p>
 <ul class="list-group">
     {% for cruise in destination.cruises.all %}
@@ -31,15 +40,20 @@ ReleCloud - {{ destination }}
 <h3>Reviews</h3>
 
 <!-- Botón para crear review -->
-<a href="{% url 'add_review_destination' destination_id=destination.id %}"
-   class="btn btn-primary">
-    Añadir review
-</a>
+{% if can_review %}
+    <a href="{% url 'destination_review_create' destination.id %}"
+       class="btn btn-primary mb-3">
+        Añadir review
+    </a>
+{% elif user.is_authenticated %}
+    <p><em>No puedes valorar este destino porque no has solicitado información de ningún crucero asociado.</em></p>
+{% else %}
+    <p><em>Inicia sesión para poder valorar este destino.</em></p>
+{% endif %}
 
 <hr>
 
-<!-- Mostrar reviews -->
-{% for review in destination.review_set.all %}
+{% for review in reviews %}
     <p><strong>{{ review.user.username }}</strong> — ⭐ {{ review.rating }}</p>
     <p>{{ review.comment }}</p>
     <hr>

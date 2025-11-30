@@ -4,6 +4,7 @@ from . import models
 # Register your models here.
 admin.site.register(models.Cruise)
 admin.site.register(models.InfoRequest)
+admin.site.register(models.Purchase)
 
 # REVIEW ADMIN
 @admin.register(models.Review)

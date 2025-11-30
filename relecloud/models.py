@@ -99,6 +99,18 @@ class InfoRequest(models.Model):
     def __str__(self):
         return self.name
 
+# ============================================================
+#  PURCHASE (COMPRA)
+# ============================================================
+
+class Purchase(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    cruise = models.ForeignKey(Cruise, on_delete=models.PROTECT)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} – {self.cruise.name}"
+
 
 # ============================================================
 #  REVIEW MANAGER

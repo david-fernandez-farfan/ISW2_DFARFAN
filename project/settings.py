@@ -71,6 +71,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # --------------------------------------------------------------------
 # 🔐 BASE DE DATOS — USANDO VARIABLE DE ENTORNO DE AZURE
 # --------------------------------------------------------------------
+
 DATABASES = {
     'default': dj_database_url.config(
         default="postgres://adminpostgre:Software.@davidpostgredjango.postgres.database.azure.com:5432/relecloud_db",
@@ -119,3 +120,11 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 # ReleCloud soporte interno
 SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", EMAIL_HOST_USER)
 
+# Media files (uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login/Logout
+LOGIN_REDIRECT_URL = 'index'       # después de login te lleva a la portada
+LOGOUT_REDIRECT_URL = 'index'      # después de logout te lleva a la portada

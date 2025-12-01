@@ -56,6 +56,6 @@ steps:
 - task: AzureWebApp@1
   displayName: "Desplegar a Azure App Service"
   inputs:
-    azureSubscription: "azureISW2_DFARFAN"
+    azureSubscription: "azure-relecloud-connection"
     appName: "DavidFFDjango"
     package: "$(System.DefaultWorkingDirectory)"

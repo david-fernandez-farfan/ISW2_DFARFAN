@@ -97,7 +97,12 @@ class InfoRequest(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        # Evita devolver None → CAUSA DEL ERROR EN EL ADMIN
+        if self.name:
+            return self.name
+        if self.email:
+            return self.email
+        return f"InfoRequest #{self.id}"
 
 # ============================================================
 #  PURCHASE (COMPRA)

@@ -2,11 +2,23 @@ trigger:
   branches:
     include:
       - main      # Ejecutar pipeline cuando haya cambios en main
+      - main      # Ejecutar pipeline cuando haya cambios en main
 
 pool:
   vmImage: "ubuntu-latest"
+  vmImage: "ubuntu-latest"
 
 variables:
+  pythonVersion: "3.13"
+
+steps:
+# ---------------------------
+# 1) Configurar Python
+# ---------------------------
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: "$(pythonVersion)"
+  displayName: "Configurar Python $(pythonVersion)"
   pythonVersion: "3.13"
 
 steps:
@@ -40,7 +52,37 @@ steps:
 - script: |
     python manage.py collectstatic --noinput
   displayName: "Generar staticfiles"
+# ---------------------------
+# 2) Instalar dependencias
+# ---------------------------
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: "Instalar dependencias del proyecto"
 
+# ---------------------------
+# 3) Ejecutar tests (opcional pero recomendado)
+# ---------------------------
+#- script: |
+#    python manage.py test
+#  displayName: "Ejecutar tests"
+#  continueOnError: true   # Evita que falle la pipeline si no tienes tests aún
+
+# ---------------------------
+# 4) Collectstatic para Django
+# ---------------------------
+- script: |
+    python manage.py collectstatic --noinput
+  displayName: "Generar staticfiles"
+
+# ---------------------------
+# 5) Publicar artefactos para deploy
+# ---------------------------
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: "$(System.DefaultWorkingDirectory)"
+    ArtifactName: "drop"
+  displayName: "Publicar artefactos"
 # ---------------------------
 # 5) Publicar artefactos para deploy
 # ---------------------------

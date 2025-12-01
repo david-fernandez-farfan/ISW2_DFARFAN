@@ -147,20 +147,46 @@ class ReviewCreateView(LoginRequiredMixin, generic.CreateView):
             return reverse_lazy("cruise_detail", args=[self.object.cruise.id])
         
         
+    # def dispatch(self, request, *args, **kwargs):
+    #     destination_id = kwargs.get("destination_id")
+    #     cruise_id = kwargs.get("cruise_id")
+
+    #     # Caso: review para DESTINATION
+    #     if destination_id:
+    #         destination = get_object_or_404(Destination, pk=destination_id)
+    #         if not user_has_purchased_destination(request.user, destination):
+    #             messages.error(request, "No puedes valorar este destino porque no has comprado ningún crucero asociado.")
+    #             return redirect("destination_detail", pk=destination.id)
+
+    #     # (Si tuvieras lógica similar para cruceros, la pondríamos aquí)
+
+    #     return super().dispatch(request, *args, **kwargs)
     def dispatch(self, request, *args, **kwargs):
-        destination_id = kwargs.get("destination_id")
-        cruise_id = kwargs.get("cruise_id")
+            destination_id = kwargs.get("destination_id")
+            cruise_id = kwargs.get("cruise_id")
 
-        # Caso: review para DESTINATION
-        if destination_id:
-            destination = get_object_or_404(Destination, pk=destination_id)
-            if not user_has_purchased_destination(request.user, destination):
-                messages.error(request, "No puedes valorar este destino porque no has comprado ningún crucero asociado.")
-                return redirect("destination_detail", pk=destination.id)
+    # Caso: review para DESTINATION
+            if destination_id:
+                destination = get_object_or_404(Destination, pk=destination_id)
+                if not user_has_purchased_destination(request.user, destination):
+                    messages.error(request, "No puedes valorar este destino porque no has comprado ningún crucero asociado.")
+                    return redirect("destination_detail", pk=destination.id)
 
-        # (Si tuvieras lógica similar para cruceros, la pondríamos aquí)
+            # ✔ NUEVO: Caso REVIEW PARA CRUISE
+            if cruise_id:
+                if not request.user.is_authenticated:
+                    messages.error(request, "Debes iniciar sesión para valorar un crucero.")
+                    return redirect("login")
 
-        return super().dispatch(request, *args, **kwargs)
+                cruise = get_object_or_404(Cruise, pk=cruise_id)
+
+                if not Purchase.objects.filter(user=request.user, cruise=cruise).exists():
+                    messages.error(request, "No puedes valorar un crucero que no has comprado.")
+                    return redirect("cruise_detail", pk=cruise.id)
+
+
+            return super().dispatch(request, *args, **kwargs)
+
     
     def form_valid(self, form):
         # Identificar si el review es para DESTINO o CRUCERO

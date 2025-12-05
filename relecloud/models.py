@@ -32,7 +32,7 @@ class Destination(models.Model):
     # PT4 — media de reviews
     @property
     def average_rating(self):
-        reviews = self.review_set.all()
+        reviews = self.reviews.all()  # ← Cambiado review_set → reviews
         if not reviews.exists():
             return None
         return round(sum(r.rating for r in reviews) / reviews.count(), 1)
@@ -65,7 +65,7 @@ class Cruise(models.Model):
     # 🔥 PT4 — media de reviews (si aplica también a cruceros)
     @property
     def average_rating(self):
-        reviews = self.review_set.all()
+        reviews = self.reviews.all()  # ← Cambiado review_set → reviews
         if not reviews.exists():
             return None
         return round(sum(r.rating for r in reviews) / reviews.count(), 1)

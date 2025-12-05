@@ -13,22 +13,27 @@ ReleCloud - {{ cruise }}
     <p>Este crucero aún no tiene valoraciones.</p>
 {% endif %}
 
-<p>
-{{ cruise.description }}
-</p>
-<p>You can explore {{ cruise }} on the following cruises:</p>
+<p>{{ cruise.description }}</p>
+
+<p>You can explore {{ cruise }} on the following destinations:</p>
 <ul class="list-group">
     {% for destination in cruise.destinations.all %}
-    <a class="list-group-item list-group-item-action" href="{% url 'destination_detail' destination.id %}">{{ destination }}</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'destination_detail' destination.id %}">
+            {{ destination }}
+        </a>
     {% endfor %}
 </ul>
 
 <h3>Reviews</h3>
 
-<a href="{% url 'add_review_cruise' cruise_id=cruise.id %}""
-   class="btn btn-primary">
-    Añadir review
-</a>
+{% if user.is_authenticated %}
+    <a href="{% url 'add_review_cruise' cruise_id=cruise.id %}"
+       class="btn btn-primary">
+        Añadir review
+    </a>
+{% else %}
+    <p><i>Inicia sesión para poder valorar este crucero.</i></p>
+{% endif %}
 
 <hr>
 

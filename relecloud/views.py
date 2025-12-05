@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count, Avg
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.messages.views import SuccessMessageMixin
@@ -21,8 +22,14 @@ def about(request):
     return render(request, 'about.html') 
 
 def destinations(request):
-    all_destinations = Destination.objects.all()
-    return render(request, 'destinations.html', {'destinations': all_destinations})
+    destinations_qs = Destination.objects.annotate(
+        num_reviews=Count("reviews"),
+        avg_rating=Avg("reviews__rating"),
+    ).order_by("-num_reviews", "-avg_rating", "name")
+
+    return render(request, "destinations.html", {
+        "destinations": destinations_qs
+    })
 
 
 # ============================

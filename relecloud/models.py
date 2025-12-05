@@ -64,7 +64,7 @@ class Cruise(models.Model):
 
     # 🔥 PT4 — media de reviews (si aplica también a cruceros)
     @property
-    def average_rating(self):
+    def average_rating(self): 
         reviews = self.reviews.all()  # ← Cambiado review_set → reviews
         if not reviews.exists():
             return None

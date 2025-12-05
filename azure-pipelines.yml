@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - main      # Ejecutar pipeline cuando haya cambios en main
+      - main          # Ejecutar pipeline cuando haya cambios en main
 
 pool:
   vmImage: "ubuntu-latest"
@@ -10,92 +10,85 @@ variables:
   pythonVersion: "3.13"
 
 steps:
-# ---------------------------
-# 1) Configurar Python
-# ---------------------------
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: "$(pythonVersion)"
-  displayName: "Configurar Python $(pythonVersion)"
-  pythonVersion: "3.13"
 
-steps:
-# ---------------------------
-# 1) Configurar Python
-# ---------------------------
+# ----------------------------------------
+# 1) Seleccionar versión de Python
+# ----------------------------------------
 - task: UsePythonVersion@0
   inputs:
     versionSpec: "$(pythonVersion)"
   displayName: "Configurar Python $(pythonVersion)"
 
-# ---------------------------
-# 2) Instalar dependencias
-# ---------------------------
+# ----------------------------------------
+# 2) Actualizar pip e instalar dependencias
+# ----------------------------------------
 - script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
   displayName: "Instalar dependencias del proyecto"
 
-# ---------------------------
-# 3) Ejecutar tests (opcional pero recomendado)
-# ---------------------------
-#- script: |
-#    python manage.py test
-#  displayName: "Ejecutar tests"
-#  continueOnError: true   # Evita que falle la pipeline si no tienes tests aún
+# ----------------------------------------
+# 3) Aplicar migraciones de Django
+# ----------------------------------------
+- script: |
+    python manage.py migrate --noinput
+  displayName: "Aplicar migraciones"
+  env:
+    DATABASE_URL: $(DATABASE_URL)
+    SECRET_KEY: $(SECRET_KEY)
+    EMAIL_HOST: $(EMAIL_HOST)
+    EMAIL_HOST_USER: $(EMAIL_HOST_USER)
+    EMAIL_HOST_PASSWORD: $(EMAIL_HOST_PASSWORD)
+    DEFAULT_FROM_EMAIL: $(DEFAULT_FROM_EMAIL)
+    SUPPORT_EMAIL: $(SUPPORT_EMAIL)
 
-# ---------------------------
-# 4) Collectstatic para Django
-# ---------------------------
+# ----------------------------------------
+# 4) Ejecutar tests (si los tienes)
+# ----------------------------------------
+- script: |
+    python manage.py test
+    displayName: "Ejecutar tests"
+    env:
+    DATABASE_URL: $(DATABASE_URL)
+
+# ----------------------------------------
+# 5) collectstatic (obligatorio para Django + Azure)
+# ----------------------------------------
 - script: |
     python manage.py collectstatic --noinput
   displayName: "Generar staticfiles"
-# ---------------------------
-# 2) Instalar dependencias
-# ---------------------------
-- script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-  displayName: "Instalar dependencias del proyecto"
+  env:
+    DATABASE_URL: $(DATABASE_URL)
 
-# ---------------------------
-# 3) Ejecutar tests (opcional pero recomendado)
-# ---------------------------
-#- script: |
-#    python manage.py test
-#  displayName: "Ejecutar tests"
-#  continueOnError: true   # Evita que falle la pipeline si no tienes tests aún
+# ----------------------------------------
+# 6) Crear un ZIP con el proyecto para deploy
+# ----------------------------------------
+- task: ArchiveFiles@2
+  displayName: "Crear archivo ZIP para despliegue"
+  inputs:
+    rootFolderOrFile: "$(System.DefaultWorkingDirectory)"
+    includeRootFolder: false
+    archiveType: "zip"
+    archiveFile: "$(Build.ArtifactStagingDirectory)/relecloud.zip"
+    replaceExistingArchive: true
 
-# ---------------------------
-# 4) Collectstatic para Django
-# ---------------------------
-- script: |
-    python manage.py collectstatic --noinput
-  displayName: "Generar staticfiles"
-
-# ---------------------------
-# 5) Publicar artefactos para deploy
-# ---------------------------
+# ----------------------------------------
+# 7) Publicar artefactos (para auditoría del pipeline)
+# ----------------------------------------
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: "$(System.DefaultWorkingDirectory)"
+    PathtoPublish: "$(Build.ArtifactStagingDirectory)"
     ArtifactName: "drop"
-  displayName: "Publicar artefactos"
-# ---------------------------
-# 5) Publicar artefactos para deploy
-# ---------------------------
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: "$(System.DefaultWorkingDirectory)"
-    ArtifactName: "drop"
-  displayName: "Publicar artefactos"
+  displayName: "Publicar artefacto ZIP"
 
 # ---------------------------
-# 6) Deploy a Azure Web App
+# 8) Deploy a Azure App Service
 # ---------------------------
-- task: AzureWebApp@1
+- task: AzureRmWebAppDeployment@4
   displayName: "Desplegar a Azure App Service"
   inputs:
+    ConnectionType: "AzureRM"
     azureSubscription: "azureISW2_DFARFAN"
-    appName: "DavidFFDjango"
-    package: "$(System.DefaultWorkingDirectory)"
+    appType: "webApp"
+    WebAppName: "DavidFFDjango"
+    packageForLinux: "$(Build.ArtifactStagingDirectory)/relecloud.zip"

@@ -25,7 +25,7 @@ class Destination(models.Model):
     def __str__(self):
         return self.name
 
-    # 🔥 PT4 — media de reviews
+    # PT4 — media de reviews
     @property
     def average_rating(self):
         reviews = self.review_set.all()

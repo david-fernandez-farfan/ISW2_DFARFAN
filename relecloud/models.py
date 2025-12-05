@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count, Avg
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
@@ -24,6 +25,9 @@ class Destination(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse("destination_detail", args=[self.id])
 
     # PT4 — media de reviews
     @property
@@ -149,13 +153,15 @@ class Review(models.Model):
         "Destination",
         null=True,
         blank=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="reviews"
     )
     cruise = models.ForeignKey(
         "Cruise",
         null=True,
         blank=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="reviews" 
     )
     rating = models.IntegerField()
     comment = models.TextField(blank=True)
@@ -177,5 +183,4 @@ class Review(models.Model):
         name = self.destination.name if self.destination else self.cruise.name
         return f"{self.user.username} → {name}"
 
-def get_absolute_url(self):
-    return reverse("destination_detail", args=[self.id])
+

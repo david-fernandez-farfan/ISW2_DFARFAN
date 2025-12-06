@@ -10,14 +10,11 @@ ReleCloud - {{ destination }}
 {# PT2 IMAGEN DEL DESTINO #}
 {% load static %}
 
-{% if destination.image %}
-    <img src="{% static 'img/destinations/' %}{{ destination.image.name|basename }}"
-         alt="{{ destination }}"
-         class="img-fluid mb-3"
-         style="max-width: 400px; border-radius: 10px;">
-{% else %}
-    <p><em>Este destino todavía no tiene imagen.</em></p>
-{% endif %}
+<img src="{% static 'img/destinations/' %}{{ destination.name|slugify }}.jpg"
+     alt="{{ destination }}"
+     class="img-fluid mb-3"
+     style="max-width: 400px; border-radius: 10px;">
+
 
 <p>{{ destination.description }}</p>
 

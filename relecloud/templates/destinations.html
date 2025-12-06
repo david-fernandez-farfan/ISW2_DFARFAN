@@ -9,11 +9,34 @@ ReleCloud - Destinations
 <p>
 If you can imagine it, we travel to it! Below is our list of confirmed destinations.
 </p>
+
 <ul class="list-group">
     {% for destination in destinations %}
     <a class="list-group-item list-group-item-action" href="{% url 'destination_detail' destination.id %}">
-        {{ destination }}
+        
+        <strong>{{ destination.name }}</strong>
+
+        <br>
+
+        <!-- ⭐ Media de valoración -->
+        <span>
+            ⭐ 
+            {% if destination.avg_rating %}
+                {{ destination.avg_rating|floatformat:1 }}/5
+            {% else %}
+                Sin valoraciones
+            {% endif %}
+        </span>
+
+        <br>
+
+        <!-- 📝 Número de reviews -->
+        <span>
+            📝 {{ destination.num_reviews|default:"0" }} opiniones
+        </span>
+
     </a>
     {% endfor %}
 </ul>
+
 {% endblock content %}

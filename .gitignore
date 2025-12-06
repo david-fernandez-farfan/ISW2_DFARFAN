@@ -1,4 +1,21 @@
+# Entornos virtuales
 venv/
-.env
-*.pyc
+.env/
+antenv/
+
+# Cachés de Python
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+
+# Archivos de empaquetado
+*.tar.gz
+*.zip
+
+# Otros (opcional)
+*.log
+.DS_Store
+.vscode/
+.idea/

@@ -1,7 +1,25 @@
+# Entornos virtuales
+venv/
+env/
+.env/
+antenv/
+
+# Cachés de Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.py[cod]
+
+# Archivos de base de datos temporales
 *.sqlite3
-env/
-venv/
+
+# Archivos de empaquetado
+*.tar.gz
+*.zip
+
+# Otros (opcional)
+*.log
+.DS_Store
+.vscode/
+.idea/

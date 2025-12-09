@@ -62,18 +62,28 @@ steps:
 - script: |
     python manage.py collectstatic --noinput
   displayName: "Generar staticfiles"
-  
+
 # ----------------------------------------
 # 6) Crear un ZIP con el proyecto para deploy
 # ----------------------------------------
+#- task: ArchiveFiles@2
+#  displayName: "Crear archivo ZIP para despliegue"
+#  inputs:
+#    rootFolderOrFile: "$(System.DefaultWorkingDirectory)"
+#    includeRootFolder: false
+#    archiveType: "zip"
+#    archiveFile: "$(Build.ArtifactStagingDirectory)/relecloud.zip"
+#    replaceExistingArchive: true
+
 - task: ArchiveFiles@2
   displayName: "Crear archivo ZIP para despliegue"
   inputs:
-    rootFolderOrFile: "$(System.DefaultWorkingDirectory)"
+    rootFolderOrFile: "$(System.DefaultWorkingDirectory)/ISW2_DFARFAN"
     includeRootFolder: false
     archiveType: "zip"
     archiveFile: "$(Build.ArtifactStagingDirectory)/relecloud.zip"
     replaceExistingArchive: true
+
 
 # ----------------------------------------
 # 7) Publicar artefactos (para auditoría del pipeline)

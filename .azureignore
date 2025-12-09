@@ -1,0 +1,32 @@
+# Ignorar entornos virtuales locales
+env/
+venv/
+.venv/
+antenv/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+
+# Editor settings
+.vscode/
+.idea/
+
+# Archivos que no deben ir al ZIP
+.git/
+*.log
+*.bak
+
+# Archivos de empaquetado
+*.zip
+*.tar.gz
+*.tgz
+
+# Base de datos local
+*.sqlite3
+
+# Staticfiles generados (Azure los generará)
+staticfiles/

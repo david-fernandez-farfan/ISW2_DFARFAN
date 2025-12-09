@@ -71,14 +71,23 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # --------------------------------------------------------------------
 # 🔐 BASE DE DATOS — USANDO VARIABLE DE ENTORNO DE AZURE
 # --------------------------------------------------------------------
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://adminpostgres:TU_PASSWORD@davidpostgresdjango.postgres.database.azure.com:5432/releccloud_db"
+)
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default="postgres://adminpostgre:Software.@davidpostgredjango.postgres.database.azure.com:5432/relecloud_db",
-        #default="postgresql://adminpostgres:***@davidpostgresdjango.postgres.database.azure.com:5432/releccloud_db",
+    #'default': dj_database_url.config(
+    #    default="postgres://adminpostgre:Software.@davidpostgredjango.postgres.database.azure.com:5432/relecloud_db",
+    #   #default="postgresql://adminpostgres:***@davidpostgresdjango.postgres.database.azure.com:5432/releccloud_db",
+    #    conn_max_age=600,
+    #    ssl_require=True
+    #)
+        'default': dj_database_url.parse(
+        DATABASE_URL,
         conn_max_age=600,
         ssl_require=True
-    )
+        )
 }
 
 # Si usas Azure App Settings:

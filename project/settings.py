@@ -74,7 +74,8 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default="postgres://adminpostgre:Software.@davidpostgredjango.postgres.database.azure.com:5432/relecloud_db",
+        #default="postgres://adminpostgre:Software.@davidpostgredjango.postgres.database.azure.com:5432/relecloud_db",
+        default="postgresql://adminpostgres:***@davidpostgresdjango.postgres.database.azure.com:5432/releccloud_db"
         conn_max_age=600,
         ssl_require=True
     )

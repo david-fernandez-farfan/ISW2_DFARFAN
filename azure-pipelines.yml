@@ -54,12 +54,15 @@ steps:
 # ----------------------------------------
 # 5) collectstatic (obligatorio para Django + Azure)
 # ----------------------------------------
+#- script: |
+  #  python manage.py collectstatic --noinput
+  #displayName: "Generar staticfiles"
+  #env:
+  #  DATABASE_URL: $(DATABASE_URL)
 - script: |
     python manage.py collectstatic --noinput
   displayName: "Generar staticfiles"
-  env:
-    DATABASE_URL: $(DATABASE_URL)
-
+  
 # ----------------------------------------
 # 6) Crear un ZIP con el proyecto para deploy
 # ----------------------------------------

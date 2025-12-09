@@ -73,7 +73,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # --------------------------------------------------------------------
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://adminpostgres:TU_PASSWORD@davidpostgresdjango.postgres.database.azure.com:5432/releccloud_db"
+    "postgres://adminpostgre:Software.@davidpostgredjango.postgres.database.azure.com:5432/relecloud_db"
 )
 
 DATABASES = {

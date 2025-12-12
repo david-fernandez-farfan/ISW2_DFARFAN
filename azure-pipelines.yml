@@ -22,10 +22,10 @@ steps:
 # ----------------------------------------
 # 2) Actualizar pip e instalar dependencias
 # ----------------------------------------
-#- script: |
-#    python -m pip install --upgrade pip
-#    pip install -r requirements.txt
-#  displayName: "Instalar dependencias del proyecto"
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: "Instalar dependencias del proyecto"
 
 # ----------------------------------------
 # 3) Aplicar migraciones de Django

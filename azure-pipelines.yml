@@ -45,11 +45,11 @@ steps:
 # ----------------------------------------
 # 4) Ejecutar tests (si los tienes)
 # ----------------------------------------
-#- script: |
-#    python manage.py test
-#    displayName: "Ejecutar tests"
-#    env:
-#      DATABASE_URL: $(DATABASE_URL)
+- script: |
+    python manage.py test
+    displayName: "Ejecutar tests"
+    env:
+      DATABASE_URL: $(DATABASE_URL)
 
 # ----------------------------------------
 # 5) collectstatic (obligatorio para Django + Azure)

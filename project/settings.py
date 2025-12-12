@@ -136,10 +136,5 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-
 # Login/Logout
 LOGIN_REDIRECT_URL = 'index'       # después de login te lleva a la portada
-LOGOUT_REDIRECT_URL = 'index'      # después de logout te lleva a la portada

@@ -6,10 +6,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = '_*&5c@1153xw6=489*2*=&*%=4)8f^m54kb@3ca-cb(wm%b@wm'
 
-DEBUG = True   # <-- Para producción
+DEBUG = False   # <-- Para producción
 
 ALLOWED_HOSTS = [
     "davidffdjango.azurewebsites.net",
+    '.azurewebsites.net',
     "localhost",
     "127.0.0.1"
 ]

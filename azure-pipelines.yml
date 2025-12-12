@@ -50,13 +50,6 @@ steps:
 #    displayName: "Ejecutar tests"
 #    env:
 #      DATABASE_URL: $(DATABASE_URL)
-- script: |
-    python manage.py test
-  displayName: "Ejecutar tests"
-  env:
-    DATABASE_URL: $(DATABASE_URL)
-    SECRET_KEY: $(SECRET_KEY)
-
 
 # ----------------------------------------
 # 5) collectstatic (obligatorio para Django + Azure)

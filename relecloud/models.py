@@ -62,7 +62,7 @@ class Cruise(models.Model):
         related_name='cruises'
     )
 
-    # 🔥 PT4 — media de reviews (si aplica también a cruceros)
+    # PT4 — media de reviews (si aplica también a cruceros)
     @property
     def average_rating(self): 
         reviews = self.reviews.all()  # ← Cambiado review_set → reviews

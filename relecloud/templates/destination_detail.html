@@ -8,12 +8,14 @@ ReleCloud - {{ destination }}
 <h1>{{ destination }}</h1>
 
 {# PT2 IMAGEN DEL DESTINO #}
-{% load static %}
 
-<img src="{% static 'img/destinations/' %}{{ destination.name|slugify }}.jpg"
-     alt="{{ destination }}"
-     class="img-fluid mb-3"
-     style="max-width: 400px; border-radius: 10px;">
+{% load static %}
+<img
+  src="{% static 'img/destinations/' %}{{ destination.name|slugify }}.jpg"
+  alt="{{ destination.name }}"
+  class="img-fluid mb-3"
+  style="max-width: 400px; border-radius: 10px;">
+
 
 
 <p>{{ destination.description }}</p>

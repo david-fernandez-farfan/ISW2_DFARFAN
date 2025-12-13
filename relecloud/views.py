@@ -41,7 +41,7 @@ def info_request_view(request):
         if form.is_valid():
             info_obj = form.save()
 
-            # 1️⃣ Correo al cliente
+            # Correo al cliente
             send_mail(
                 subject=f"ReleCloud – Solicitud #{info_obj.id}",
                 message=(
@@ -52,10 +52,10 @@ def info_request_view(request):
                 ),
                 from_email=f"ReleCloud <{settings.DEFAULT_FROM_EMAIL}>",
                 recipient_list=[info_obj.email],
-                fail_silently=False,
+                fail_silently=True,
             )
 
-            # 2️⃣ Correo al administrador
+            # Correo al administrador
             send_mail(
                 subject=f"Nueva solicitud #{info_obj.id}",
                 message=(
@@ -66,7 +66,7 @@ def info_request_view(request):
                 ),
                 from_email=f"ReleCloud <{settings.DEFAULT_FROM_EMAIL}>",
                 recipient_list=[settings.SUPPORT_EMAIL],
-                fail_silently=False,
+                fail_silently=True,
             )
 
             return redirect("info_request_success")
@@ -179,7 +179,7 @@ class ReviewCreateView(LoginRequiredMixin, generic.CreateView):
                     messages.error(request, "No puedes valorar este destino porque no has comprado ningún crucero asociado.")
                     return redirect("destination_detail", pk=destination.id)
 
-            # ✔ NUEVO: Caso REVIEW PARA CRUISE
+            # NUEVO: Caso REVIEW PARA CRUISE
             if cruise_id:
                 if not request.user.is_authenticated:
                     messages.error(request, "Debes iniciar sesión para valorar un crucero.")

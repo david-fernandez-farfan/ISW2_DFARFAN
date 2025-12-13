@@ -138,4 +138,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Login/Logout
 LOGIN_REDIRECT_URL = 'index'       # después de login te lleva a la portada
-LOGOUT_REDIRECT_URL = 'index'      # después de logout te lleva a la portada
